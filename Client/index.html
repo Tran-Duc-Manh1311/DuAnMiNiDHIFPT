@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách khách hàng</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Danh sách khách hàng</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Số điện thoại</th>
+                <th>Tên khách hàng</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Email</th>
+                <th>Loại khách hàng</th>
+            </tr>
+        </thead>
+        <tbody id="customer-table">
+            <!-- Dữ liệu khách hàng sẽ được thêm vào đây -->
+        </tbody>
+    </table>
+<script>
+       async function fetchCustomers() {
+        try {
+           
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50SUQiOiIyYzAzNjM1ZS1iMmVmLTExZWYtYTI4Mi1kODQzYWUwYWIwOTMiLCJleHAiOjE3MzM0NzMyMDgsInBob25lTnVtYmVyIjoiMDExMTEyMjQ0MzMifQ.IbunEZq4dURAFS25nmUtHVVGFbzA_zXOemz6Rd0RkzM'; // Thay 'your_test_token_here' bằng token của bạn
+
+            // Gửi yêu cầu đến API
+            const response = await fetch('http://127.0.0.1:3000/customers', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể lấy dữ liệu khách hàng');
+            }
+
+            const customers = await response.json();
+            const tableBody = document.getElementById('customer-table');
+
+            // Xóa dữ liệu cũ
+            tableBody.innerHTML = '';
+
+            // Thêm dữ liệu mới
+            customers.forEach(customer => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${customer.SoDienThoai}</td>
+                    <td>${customer.TenKhachHang}</td>
+                    <td>${customer.GioiTinh}</td>
+                    <td>${customer.NgaySinh || 'N/A'}</td>
+                    <td>${customer.Email}</td>
+                    <td>${customer.LoaiKhachHang}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error(error);
+            alert('Có lỗi xảy ra khi tải danh sách khách hàng');
+        }
+    }
+
+    // Gọi hàm fetchCustomers tự động khi tải trang để kiểm tra
+    document.addEventListener('DOMContentLoaded', fetchCustomers);
+
+
+    // Gọi hàm fetchCustomers khi nhấn nút "Lấy danh sách khách hàng"
+    document.addEventListener('DOMContentLoaded', () => {
+        const fetchButton = document.getElementById('fetch-button');
+        fetchButton.addEventListener('click', fetchCustomers);
+    });
+</script>
+
+   
+</body>
+</html>

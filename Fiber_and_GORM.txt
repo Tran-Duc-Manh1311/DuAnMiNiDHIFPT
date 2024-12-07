@@ -1,0 +1,18 @@
+Fiber: Framework xử lý các yêu cầu HTTP và định tuyến các endpoint.
+GORM: ORM giúp tương tác với cơ sở dữ liệu dễ dàng hơn thông qua các model.
+
+
+
+Vị trí trong code	    Fiber (HTTP)	                                    GORM (Cơ sở dữ liệu)
+main.go	Tạo             Fiber app, chạy server	                            Không có
+routes/routes.go	    Định tuyến HTTP request	                            Không có
+controllers/product.go	Nhận request (c.BodyParser), trả JSON (c.JSON)	    Thao tác dữ liệu: Find(), Create(), Delete()
+database/database.go	Không có	                                        Kết nối DB
+models/product.go	    Không có	                                        Khai báo model, ánh xạ bảng
+
+
+cách cài đặt Fiber và GORM
+B1: tạo (go mod init name dự án) cho dự án 
+B2: cài fiber:  go get github.com/gofiber/fiber/v2
+B3: Cài GORM : go get gorm.io/gorm
+               go get gorm.io/driver/mysql

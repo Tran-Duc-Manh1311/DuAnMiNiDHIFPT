@@ -1,0 +1,11 @@
+models/product.go: Định nghĩa các model như Product để đại diện cho dữ liệu.
+controllers/product.go: Viết các hàm xử lý logic liên quan đến sản phẩm (CRUD).
+routes/routes.go: Định nghĩa route ánh xạ endpoint tới controller.
+main.go: Tích hợp Fiber, route, và khởi động ứng dụng.
+
+
+"github.com/gofiber/fiber/v2"       //Tạo các API RESTful hoặc web service vàXử lý các yêu cầu HTTP, bao gồm GET, POST, PUT, DELETE, v.v.
+	"github.com/gofiber/fiber/v2/utils" //Cung cấp các hàm tiện ích cho các thao tác phổ biến như tạo UUID, mã hóa URL, xử lý chuỗi, v.v.
+	"github.com/jinzhu/gorm"            //Tương tác với cơ sở dữ liệu (MySQL, PostgreSQL, SQLite, MSSQL, v.v.) và Hỗ trợ các thao tác như tạo, đọc, cập nhật, xóa (CRUD).
+	"golang.org/x/crypto/bcrypt"        // Một thư viện dùng để mã hóa mật khẩu an toàn bằng thuật toán bcrypt.
+	"strconv" //Thư viện chuẩn của Go để chuyển đổi giữa các kiểu dữ liệu số và chuỗi.
