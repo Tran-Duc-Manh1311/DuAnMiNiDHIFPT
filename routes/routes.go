@@ -17,7 +17,7 @@ func Setup(app *fiber.App) {
 	// Route lấy thông tin hợp đồng (cần xác thực)
 	app.Get("/contracts", middleware.Authenticate, controllers.GetContracts)
 	// Route lấy thông tin hợp đồng theo ID (cần xác thực)
-	app.Get("/contracts/:id", middleware.Authenticate, controllers.GetContractByID)
+	app.Get("/`contracts`/:id", middleware.Authenticate, controllers.GetContractByID)
 
 	// Route tạo hợp đồng mới (cần xác thực)
 	app.Post("/contracts", middleware.Authenticate, controllers.CreateContract)

@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"MiniHIFPT/database"
-
+	"MiniHIFPT/models"
 	"github.com/gofiber/fiber/v2"
 )
 
+// API chuyển sở hữu hợp đồng
 // API chuyển sở hữu hợp đồng
 func TransferOwnership(c *fiber.Ctx) error {
 	// Lấy tham số từ yêu cầu JSON
@@ -14,10 +15,30 @@ func TransferOwnership(c *fiber.Ctx) error {
 		NewCustomerID string `json:"newCustomerId"`
 	}
 
+	// Lấy accountID từ thông tin người dùng đã đăng nhập (tương tự như trong UpdateContract)
+	accountID := c.Locals("accountID").(string)
+
 	// Phân tích dữ liệu JSON từ yêu cầu
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Giá trị nhập vào không hợp lệ",
+		})
+	}
+
+	// Kiểm tra quyền truy cập của tài khoản đối với khách hàng cũ
+	var count int64
+	// Kiểm tra xem tài khoản có quyền truy cập vào hợp đồng của khách hàng cũ hay không
+	if err := database.DB.Model(&models.Account_Contract{}).
+		Where("AccountID = ? AND CustomerID = ?", accountID, request.OldCustomerID).
+		Count(&count).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Lỗi khi kiểm tra quyền truy cập",
+		})
+	}
+
+	if count == 0 {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Bạn không có quyền chuyển nhượng hợp đồng này",
 		})
 	}
 

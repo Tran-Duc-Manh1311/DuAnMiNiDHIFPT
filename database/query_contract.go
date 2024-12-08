@@ -3,6 +3,7 @@ package database
 import (
 	"MiniHIFPT/models"
 	"fmt"
+	"gorm.io/gorm"
 )
 
 // Lấy tất cả các hợp đồng
@@ -46,4 +47,19 @@ func UpdateContract(contract *models.Contract, updates map[string]interface{}) e
 func DeleteContract(contract *models.Contract) error {
 	result := DB.Delete(&contract)
 	return result.Error
+}
+
+// Kiểm tra hợp đồng có tồn tại dựa trên các thông tin chi tiết
+func FindContractByDetails(tenKhachHang, diaChi, maTinh, maQuanHuyen string) (*models.Contract, error) {
+	var contract models.Contract
+	err := DB.Where("TenKhachHang = ? AND DiaChi = ? AND MaTinh = ? AND MaQuanHuyen = ?",
+		tenKhachHang, diaChi, maTinh, maQuanHuyen).First(&contract).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil // Không tìm thấy hợp đồng
+		}
+		return nil, err // Lỗi khi truy vấn
+	}
+	return &contract, nil // Hợp đồng đã tồn tại
 }

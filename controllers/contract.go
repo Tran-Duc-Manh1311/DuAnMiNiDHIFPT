@@ -3,11 +3,9 @@ package controllers
 import (
 	"MiniHIFPT/database"
 	"MiniHIFPT/models"
-	// "errors"
 	"github.com/gofiber/fiber/v2"
-	// "gorm.io/gorm"
-
 	"github.com/google/uuid"
+	"regexp"
 )
 
 // Lấy thông tin các hợp đồng
@@ -106,7 +104,19 @@ func CreateContract(c *fiber.Ctx) error {
 			"error": "Thiếu thông tin cần thiết",
 		})
 	}
+	// Kiểm tra xem hợp đồng đã tồn tại hay chưa
+	existingContract, err := database.FindContractByDetails(contract.TenKhachHang, contract.DiaChi, contract.MaTinh, contract.MaQuanHuyen)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Lỗi khi kiểm tra hợp đồng tồn tại",
+		})
+	}
 
+	if existingContract != nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"error": "Hợp đồng đã tồn tại",
+		})
+	}
 	if err := database.CreateContract(&contract); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Không thể tạo hợp đồng",
@@ -128,11 +138,11 @@ func UpdateContract(c *fiber.Ctx) error {
 	idUUID, err := uuid.Parse(contractID)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-
-			"error": "ID hợp đồng không hợp lệ" + err.Error(),
+			"error": "ID hợp đồng không hợp lệ: " + err.Error(),
 		})
 	}
 
+	// Kiểm tra quyền của tài khoản với hợp đồng
 	if err := database.DB.Model(&models.Account_Contract{}).
 		Where("AccountID = ? AND ContractID = ?", accountID, idUUID).
 		Count(&count).Error; err != nil {
@@ -146,6 +156,7 @@ func UpdateContract(c *fiber.Ctx) error {
 			"error": "Bạn không có quyền sửa hợp đồng này",
 		})
 	}
+
 	// Lấy thông tin hợp đồng từ cơ sở dữ liệu
 	contract, err := database.GetContractByID(contractID)
 	if err != nil {
@@ -159,6 +170,38 @@ func UpdateContract(c *fiber.Ctx) error {
 	if err := c.BodyParser(&updatedData); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Dữ liệu đầu vào không hợp lệ",
+		})
+	}
+
+	// Kiểm tra các trường không hợp lệ hoặc thiếu thông tin
+	if updatedData.TenKhachHang == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Tên khách hàng không được để trống",
+		})
+	}
+
+	// Kiểm tra tên khách hàng
+	nameRegex := `^[\p{L}\s]+$`
+	matched, err := regexp.MatchString(nameRegex, contract.TenKhachHang)
+	if err != nil || !matched {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Tên khách hàng không hợp lệ",
+		})
+	}
+
+	if updatedData.DiaChi == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Địa chỉ không được để trống",
+		})
+	}
+	if updatedData.MaTinh == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Mã tỉnh không được để trống",
+		})
+	}
+	if updatedData.MaQuanHuyen == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Mã quận huyện không được để trống",
 		})
 	}
 

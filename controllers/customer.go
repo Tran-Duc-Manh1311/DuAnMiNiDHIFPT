@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Lấy thông tin các kh
+// Lấy thông tin các khách hàng
 func GetCustomers(c *fiber.Ctx) error {
 	customers, err := database.GetCustomers()
 	if err != nil {
@@ -37,7 +37,7 @@ func CreateCustomers(c *fiber.Ctx) error {
 			// "details": err.Error(),
 		})
 	}
-	//...
+
 	// Chuyển đổi ngày sinh từ chuỗi thành kiểu `time.Time`
 	var parsedDate *time.Time
 	if tempCustomer.NgaySinh != "" {
