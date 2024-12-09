@@ -7,7 +7,6 @@ import (
 )
 
 // API chuyển sở hữu hợp đồng
-// API chuyển sở hữu hợp đồng
 func TransferOwnership(c *fiber.Ctx) error {
 	// Lấy tham số từ yêu cầu JSON
 	var request struct {

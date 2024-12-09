@@ -19,36 +19,6 @@ func GetContracts(c *fiber.Ctx) error {
 	return c.JSON(contracts)
 }
 
-// Thêm quyền truy cập cho tài khoản đối với hợp đồng
-func AddContractAccess(c *fiber.Ctx) error {
-	var data struct {
-		AccountID  string `json:"accountID"`
-		ContractID string `json:"contractID"`
-	}
-
-	if err := c.BodyParser(&data); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Dữ liệu đầu vào không hợp lệ",
-		})
-	}
-
-	// Thêm quyền truy cập vào bảng trung gian
-	accountContract := models.Account_Contract{
-		AccountID:  data.AccountID,
-		ContractID: data.ContractID,
-	}
-
-	if err := database.DB.Create(&accountContract).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Không thể thêm quyền truy cập",
-		})
-	}
-
-	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"message": "Thêm quyền truy cập thành công",
-	})
-}
-
 // Lấy hợp đồng theo ID (chỉ cho phép xem hợp đồng của tài khoản)
 func GetContractByID(c *fiber.Ctx) error {
 	contractID := c.Params("id")

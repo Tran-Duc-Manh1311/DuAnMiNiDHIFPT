@@ -10,8 +10,8 @@ var DB *gorm.DB
 
 func ConnectDB() {
 
-	dsn := "root:@tcp(127.0.0.1:3306)/minihifpt?charset=utf8mb4&parseTime=True&loc=Local"
-	// dsn := "root:@tcp(127.0.0.1:3306)/testminihifpt?charset=utf8mb4&parseTime=True&loc=Local"
+	// dsn := "root:@tcp(127.0.0.1:3306)/minihifpt?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:@tcp(127.0.0.1:3306)/testminihifpt?charset=utf8mb4&parseTime=True&loc=Local"
 
 	// Kết nối tới DB
 	connection, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

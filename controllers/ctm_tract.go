@@ -20,23 +20,6 @@ func Getctm_tracts(c *fiber.Ctx) error {
 
 // Hàm tạo liên kết hợp đồng
 func Createctm_tracts(c *fiber.Ctx) error {
-	// Lấy accountID từ request context (tương tự như UpdateContract)
-	accountID := c.Locals("accountID").(string)
-
-	// Kiểm tra quyền truy cập của tài khoản (ví dụ kiểm tra quyền tạo hợp đồng)
-	var count int64
-	if err := database.DB.Model(&models.Accounts{}).Where("id_uuid = ?", accountID).Count(&count).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Lỗi khi kiểm tra quyền truy cập",
-		})
-	}
-
-	// Nếu không tìm thấy tài khoản hoặc tài khoản không có quyền tạo hợp đồng
-	if count == 0 {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Bạn không có quyền quyền truy cập",
-		})
-	}
 
 	// Khai báo cấu trúc Customer_Contractt
 	var ctm_tract models.Customer_Contractt
