@@ -100,7 +100,6 @@ type Devices struct {
 	DeviceName      string    `json:"deviceName" gorm:"column:DeviceName;size:100"`                   // Tên thiết bị
 	DeviceType      string    `json:"deviceType" gorm:"column:DeviceType;size:50"`                    // Loại thiết bị
 	OperatingSystem string    `json:"operatingSystem" gorm:"column:OperatingSystem;size:50"`          // Hệ điều hành
-	LastIPAddress   string    `json:"lastIPAddress" gorm:"column:LastIPAddress;size:50"`              // Địa chỉ IP cuối
 	Status          string    `json:"status" gorm:"column:Status;size:20;default:'Active'"`           // Trạng thái thiết bị
 	LanDungGanNhat  time.Time `json:"lanDungGanNhat" gorm:"autoUpdateTime;column:LanDungGanNhat"`     // Lần sử dụng gần nhất
 	CreatedAt       time.Time `gorm:"autoCreateTime;column:CreatedAt"`                                // Thời gian tạo

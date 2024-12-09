@@ -104,6 +104,7 @@ func CreateContract(c *fiber.Ctx) error {
 			"error": "Thiếu thông tin cần thiết",
 		})
 	}
+
 	// Kiểm tra xem hợp đồng đã tồn tại hay chưa
 	existingContract, err := database.FindContractByDetails(contract.TenKhachHang, contract.DiaChi, contract.MaTinh, contract.MaQuanHuyen)
 	if err != nil {
@@ -117,6 +118,17 @@ func CreateContract(c *fiber.Ctx) error {
 			"error": "Hợp đồng đã tồn tại",
 		})
 	}
+
+	//kiểm tra tên khách hàng
+	nameRegex := "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưạ-ỹẠ-Ỹ ]+$"
+
+	matched, err := regexp.MatchString(nameRegex, contract.TenKhachHang)
+	if err != nil || !matched {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng.",
+		})
+	}
+
 	if err := database.CreateContract(&contract); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Không thể tạo hợp đồng",
@@ -128,7 +140,6 @@ func CreateContract(c *fiber.Ctx) error {
 	})
 }
 
-// Sửa thông tin hợp đồng
 func UpdateContract(c *fiber.Ctx) error {
 	contractID := c.Params("id")
 	accountID := c.Locals("accountID").(string)
@@ -173,22 +184,12 @@ func UpdateContract(c *fiber.Ctx) error {
 		})
 	}
 
-	// Kiểm tra các trường không hợp lệ hoặc thiếu thông tin
+	// Kiểm tra các trường hợp thiếu thông tin
 	if updatedData.TenKhachHang == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Tên khách hàng không được để trống",
 		})
 	}
-
-	// Kiểm tra tên khách hàng
-	nameRegex := `^[\p{L}\s]+$`
-	matched, err := regexp.MatchString(nameRegex, contract.TenKhachHang)
-	if err != nil || !matched {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Tên khách hàng không hợp lệ",
-		})
-	}
-
 	if updatedData.DiaChi == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Địa chỉ không được để trống",
@@ -205,28 +206,31 @@ func UpdateContract(c *fiber.Ctx) error {
 		})
 	}
 
+	// Kiểm tra tên khách hàng với regex
+	nameRegex := "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưạ-ỹẠ-Ỹ ]+$"
+	matched, err := regexp.MatchString(nameRegex, updatedData.TenKhachHang)
+	if err != nil || !matched {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng.",
+		})
+	}
+
 	// Cập nhật các trường hợp hợp đồng
-	updates := map[string]interface{}{}
-	if updatedData.TenKhachHang != "" {
-		updates["TenKhachHang"] = updatedData.TenKhachHang
+	updates := map[string]interface{}{
+		"TenKhachHang": updatedData.TenKhachHang,
+		"DiaChi":       updatedData.DiaChi,
+		"MaTinh":       updatedData.MaTinh,
+		"MaQuanHuyen":  updatedData.MaQuanHuyen,
+		"MaPhuongXa":   updatedData.MaPhuongXa,
+		"MaDuong":      updatedData.MaDuong,
+		"SoNha":        updatedData.SoNha,
 	}
-	if updatedData.DiaChi != "" {
-		updates["DiaChi"] = updatedData.DiaChi
-	}
-	if updatedData.MaTinh != "" {
-		updates["MaTinh"] = updatedData.MaTinh
-	}
-	if updatedData.MaQuanHuyen != "" {
-		updates["MaQuanHuyen"] = updatedData.MaQuanHuyen
-	}
-	if updatedData.MaPhuongXa != "" {
-		updates["MaPhuongXa"] = updatedData.MaPhuongXa
-	}
-	if updatedData.MaDuong != "" {
-		updates["MaDuong"] = updatedData.MaDuong
-	}
-	if updatedData.SoNha != "" {
-		updates["SoNha"] = updatedData.SoNha
+
+	// Xóa các trường có giá trị rỗng khỏi map updates
+	for key, value := range updates {
+		if value == "" {
+			delete(updates, key)
+		}
 	}
 
 	// Nếu có trường hợp cần cập nhật, thực hiện cập nhật

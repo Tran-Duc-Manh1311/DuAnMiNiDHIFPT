@@ -4,6 +4,7 @@ import (
 	"MiniHIFPT/database"
 	"MiniHIFPT/models"
 	"github.com/gofiber/fiber/v2"
+	"regexp"
 	"time"
 )
 
@@ -23,7 +24,7 @@ func CreateCustomers(c *fiber.Ctx) error {
 		SoDienThoai   string `json:"SoDienThoai"`
 		TenKhachHang  string `json:"TenKhachHang"`
 		GioiTinh      string `json:"GioiTinh"`
-		NgaySinh      string `json:"NgaySinh"` // Ngày sinh là chuỗi tạm thời
+		NgaySinh      string `json:"NgaySinh"`
 		Email         string `json:"Email"`
 		LoaiKhachHang string `json:"LoaiKhachHang"`
 	}
@@ -65,6 +66,16 @@ func CreateCustomers(c *fiber.Ctx) error {
 	if customer.SoDienThoai == "" || customer.TenKhachHang == "" || customer.GioiTinh == "" || customer.Email == "" || customer.LoaiKhachHang == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Thiếu thông tin cần thiết",
+		})
+	}
+
+	//kiểm tra tên khách hàng
+	nameRegex := "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưạ-ỹẠ-Ỹ ]+$"
+
+	matched, err := regexp.MatchString(nameRegex, customer.TenKhachHang)
+	if err != nil || !matched {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng.",
 		})
 	}
 

@@ -3,7 +3,6 @@ package controllers
 import (
 	"MiniHIFPT/database"
 	"MiniHIFPT/models"
-
 	"github.com/gofiber/fiber/v2"
 
 	"golang.org/x/crypto/bcrypt"
