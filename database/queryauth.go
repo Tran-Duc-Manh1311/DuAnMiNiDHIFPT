@@ -92,26 +92,6 @@ func ParseDeviceName(deviceName string) string {
 	return re.ReplaceAllString(deviceName, "")
 }
 
-// Hàm phân tích hệ điều hành từ User-Agent
-// func ParseOperatingSystem(userAgent string) string {
-// 	// Chuyển User-Agent thành chữ thường để xử lý dễ dàng
-// 	ua := strings.ToLower(userAgent)
-
-// 	// Kiểm tra các hệ điều hành phổ biến
-// 	if matched, _ := regexp.MatchString("windows", ua); matched {
-// 		return "Windows"
-// 	} else if matched, _ := regexp.MatchString("macintosh|mac os x", ua); matched {
-// 		return "macOS"
-// 	} else if matched, _ := regexp.MatchString("x11|linux", ua); matched {
-// 		return "Linux"
-// 	} else if matched, _ := regexp.MatchString("android", ua); matched {
-// 		return "Android"
-// 	} else if matched, _ := regexp.MatchString("iphone|ipad|ios", ua); matched {
-// 		return "iOS"
-// 	}
-
-//		return "Unknown OS"
-//	}
 func ParseOperatingSystem(userAgent string) string {
 	ua := user_agent.New(userAgent)
 	if ua.OS() != "" {
@@ -160,4 +140,22 @@ func GetDailyLoginAttempts(phone string) (*models.LoginAttempt, error) {
 // Hàm lưu số lần đăng nhập thất bại của người dùng
 func SaveLoginAttempt(attempt *models.LoginAttempt) error {
 	return DB.Save(attempt).Error
+}
+
+// Lưu thông tin người dùng và thiết bị
+func SaveDeviceUser(account *models.Accounts, device *models.Devices) error {
+	// Lưu thông tin người dùng vào cơ sở dữ liệu
+	err := DB.Create(account).Error
+	if err != nil {
+		return err
+	}
+
+	// Lưu thông tin thiết bị vào cơ sở dữ liệu
+	err = DB.Create(device).Error
+	if err != nil {
+		return err
+	}
+
+	// Trả về nil nếu cả hai thông tin được lưu thành công
+	return nil
 }

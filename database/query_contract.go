@@ -50,10 +50,10 @@ func DeleteContract(contract *models.Contract) error {
 }
 
 // Kiểm tra hợp đồng có tồn tại dựa trên các thông tin chi tiết
-func FindContractByDetails(tenKhachHang, diaChi, maTinh, maQuanHuyen string) (*models.Contract, error) {
+func FindContractByDetails(tenKhachHang string) (*models.Contract, error) {
 	var contract models.Contract
-	err := DB.Where("TenKhachHang = ? AND DiaChi = ? AND MaTinh = ? AND MaQuanHuyen = ?",
-		tenKhachHang, diaChi, maTinh, maQuanHuyen).First(&contract).Error
+	err := DB.Where("TenKhachHang = ?",
+		tenKhachHang).First(&contract).Error
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

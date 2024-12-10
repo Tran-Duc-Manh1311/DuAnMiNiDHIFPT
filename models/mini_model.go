@@ -106,3 +106,15 @@ type Devices struct {
 	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:UpdatedAt"`                                // Thời gian cập nhật
 	XacThucOTP      bool      `json:"xacThucOTP" gorm:"default:false;column:XacThucOTP"`
 }
+
+type DeviceUser struct {
+	ID        string    `gorm:"primaryKey;type:char(36);default:uuid();column:id_uuid"`
+	DeviceID  string    `gorm:"type:char(36);not null"`
+	AccountID string    `gorm:"type:char(36);not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime;column:CreatedAt"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime;column:UpdatedAt"`
+}
+
+func (DeviceUser) TableName() string {
+	return "deviceuser"
+}

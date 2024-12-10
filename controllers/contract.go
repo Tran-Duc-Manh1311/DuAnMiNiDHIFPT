@@ -76,7 +76,7 @@ func CreateContract(c *fiber.Ctx) error {
 	}
 
 	// Kiểm tra xem hợp đồng đã tồn tại hay chưa
-	existingContract, err := database.FindContractByDetails(contract.TenKhachHang, contract.DiaChi, contract.MaTinh, contract.MaQuanHuyen)
+	existingContract, err := database.FindContractByDetails(contract.TenKhachHang)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Lỗi khi kiểm tra hợp đồng tồn tại",
@@ -95,7 +95,7 @@ func CreateContract(c *fiber.Ctx) error {
 	matched, err := regexp.MatchString(nameRegex, contract.TenKhachHang)
 	if err != nil || !matched {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng.",
+			"error": "Tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu,chữ hoa và chữ thường, khoảng trắng.",
 		})
 	}
 
@@ -134,7 +134,7 @@ func UpdateContract(c *fiber.Ctx) error {
 
 	if count == 0 {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Bạn không có quyền sửa hợp đồng này",
+			"error": "Bạn không có quyền cập nhật hợp đồng này",
 		})
 	}
 
@@ -213,7 +213,7 @@ func UpdateContract(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"message": "Sửa hợp đồng thành công",
+		"message": "Cập nhật hợp đồng thành công",
 	})
 }
 
