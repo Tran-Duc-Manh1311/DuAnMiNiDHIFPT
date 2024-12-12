@@ -3,6 +3,7 @@ package database
 import (
 	"MiniHIFPT/models"
 	"fmt"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -44,8 +45,8 @@ func UpdateContract(contract *models.Contract, updates map[string]interface{}) e
 }
 
 // Xóa hợp đồng
-func DeleteContract(contract *models.Contract) error {
-	result := DB.Delete(&contract)
+func DeleteContract(idUUID uuid.UUID) error {
+	result := DB.Delete(&models.Contract{}, "id_uuid = ?", idUUID)
 	return result.Error
 }
 
@@ -62,4 +63,17 @@ func FindContractByDetails(tenKhachHang string) (*models.Contract, error) {
 		return nil, err // Lỗi khi truy vấn
 	}
 	return &contract, nil // Hợp đồng đã tồn tại
+}
+
+// Kiểm tra quyền truy cập của tài khoản đối với hợp đồng
+func CheckAccess(accountID, contractID string) (int64, error) {
+	var count int64
+	idUUID, err := uuid.Parse(contractID)
+	if err != nil {
+		return 0, err
+	}
+	err = DB.Model(&models.Account_Contract{}).
+		Where("AccountID = ? AND ContractID = ?", accountID, idUUID).
+		Count(&count).Error
+	return count, err
 }

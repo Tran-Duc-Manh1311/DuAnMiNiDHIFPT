@@ -18,16 +18,19 @@ func Setup(app *fiber.App) {
 	app.Get("/contracts", middleware.Authenticate, controllers.GetContracts)
 	// Route lấy thông tin hợp đồng theo ID (cần xác thực)
 	app.Get("/contracts/:id", middleware.Authenticate, controllers.GetContractByID)
-
+	//tìm kiếm
+	app.Get("/search", middleware.Authenticate, controllers.SearchContractOrCustomer)
+	//kiểm tra trạng thái của hợp đồng
+	app.Get("status/:id", middleware.Authenticate, controllers.CheckContractStatusHandler)
 	// Route tạo hợp đồng mới (cần xác thực)
-	app.Post("/contracts", middleware.Authenticate, controllers.CreateContract)
+	app.Post("/contracts", middleware.Authenticate, controllers.CreateContractHandler)
 	// Route sửa hợp đồng (cần xác thực)
 	app.Put("/contracts/:id", middleware.Authenticate, controllers.UpdateContract)
 	// Route xóa hợp đồng (cần xác thực)
 	app.Delete("/contracts/:id", middleware.Authenticate, controllers.DeleteContract)
 	// Liên kết hợp đồng (cần xác thực)
-	app.Get("/ctmtract", middleware.Authenticate, controllers.Getctm_tracts)
-	app.Post("/Createctmtract", middleware.Authenticate, controllers.Createctm_tracts)
+	app.Get("/ctmtract", middleware.Authenticate, controllers.GetCtmContracts)
+	app.Post("/Createctmtract", middleware.Authenticate, controllers.CreateCtmContracts)
 
 	// Route đăng ký tài khoản (không cần xác thực)
 	app.Post("/register", controllers.Register)

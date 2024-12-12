@@ -7,6 +7,7 @@ import (
 	"regexp"
 	// "strings"
 	"github.com/mssola/user_agent"
+	// "fmt"
 	"time"
 )
 
@@ -37,6 +38,8 @@ func GetAccountByPhone(soDienThoai string) (*models.Accounts, error) {
 	}
 	return &account, nil
 }
+
+///
 
 // Lấy thiết bị theo số điện thoại
 func GetDeviceByPhone(soDienThoai string) (*models.Devices, error) {
@@ -101,16 +104,38 @@ func ParseOperatingSystem(userAgent string) string {
 	return "Unknown OS"
 }
 
+// func ParseOperatingSystem(userAgent string) string {
+// 	fmt.Println("Received User-Agent:", userAgent) // In ra User-Agent để kiểm tra
+// 	userAgent = strings.ToLower(userAgent)
+
+// 	if strings.Contains(userAgent, "windows") {
+// 		return "Windows"
+// 	} else if strings.Contains(userAgent, "mac os") || strings.Contains(userAgent, "macintosh") {
+// 		return "Mac OS"
+// 	} else if strings.Contains(userAgent, "linux") {
+// 		return "Linux"
+// 	} else if strings.Contains(userAgent, "android") {
+// 		return "Android"
+// 	} else if strings.Contains(userAgent, "iphone") || strings.Contains(userAgent, "ipad") || strings.Contains(userAgent, "ios") {
+// 		return "iOS"
+// 	}
+// 	return "Unknown OS"
+// }
+
 // Tạo thiết bị mới trong cơ sở dữ liệu
 func CreateDevice(device *models.Devices) error {
-	// Kiểm tra xem thiết bị có tồn tại chưa
+	// Kiểm tra xem UUID đã tồn tại chưa
 	var existingDevice models.Devices
-	err := DB.Where("DeviceName = ?", device.DeviceName).First(&existingDevice).Error
+	err := DB.Where("id_uuid = ?", device.ID).First(&existingDevice).Error
 	if err == nil {
-		// Nếu đã tồn tại thiết bị, trả về lỗi
-		return errors.New("device already exists")
+		// Nếu UUID đã tồn tại, trả về lỗi
+		return errors.New("device UUID already exists")
+	} else if err != gorm.ErrRecordNotFound {
+		// Nếu có lỗi khác ngoài lỗi không tìm thấy bản ghi
+		return err
 	}
-	// Tạo thiết bị mới
+
+	// Tạo thiết bị mới nếu UUID chưa tồn tại
 	return DB.Create(device).Error
 }
 

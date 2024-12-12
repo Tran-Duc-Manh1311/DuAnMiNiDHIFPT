@@ -20,3 +20,12 @@ func CreateCustomerContract(ctm_tract *models.Customer_Contractt) error {
 	}
 	return nil
 }
+
+// Kiểm tra xem số điện thoại đã được liên kết với hợp đồng trước đó chưa
+func CheckExistingContract(phone string) (int64, error) {
+	var count int64
+	if err := DB.Model(&models.Customer_Contractt{}).Where("SoDienThoai = ?", phone).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	return count, nil
+}

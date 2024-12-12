@@ -5,6 +5,14 @@ import (
 )
 
 // ----------------------- Khách hàng -----------------------
+type TempCustomer struct {
+	SoDienThoai   string `json:"SoDienThoai"`
+	TenKhachHang  string `json:"TenKhachHang"`
+	GioiTinh      string `json:"GioiTinh"`
+	NgaySinh      string `json:"NgaySinh"`
+	Email         string `json:"Email"`
+	LoaiKhachHang string `json:"LoaiKhachHang"`
+}
 type Customer struct {
 	ID            string     `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id_uuid"` // UUID tự động
 	SoDienThoai   string     `json:"soDienThoai" gorm:"column:SoDienThoai"`                          // Số điện thoại khách hàng
@@ -13,7 +21,6 @@ type Customer struct {
 	NgaySinh      *time.Time `gorm:"type:date;column:NgaySinh" json:"ngaySinh"`
 	Email         string     `json:"email" gorm:"column:Email"`                                          // Email khách hàng
 	LoaiKhachHang string     `gorm:"type:char(1);default:'T';column:LoaiKhachHang" json:"loaiKhachHang"` // Loại khách hàng: Tiềm năng (T) hoặc Sử dụng dịch vụ (S)
-	// Contracts     []Contract `gorm:"many2many:customer_contracts;" json:"contracts"`                     // Quan hệ nhiều-nhiều với Contract
 }
 
 // Chỉ định tên bảng
@@ -31,6 +38,7 @@ type Contract struct {
 	MaPhuongXa   string `gorm:"column:MaPhuongXa;not null"`
 	MaDuong      string `gorm:"column:MaDuong;null"`
 	SoNha        string `gorm:"column:SoNha;null"`
+	Status       string `gorm:"column:Status;default:'Active'"`
 }
 
 // Chỉ định tên bảng trong MySQL
@@ -105,16 +113,4 @@ type Devices struct {
 	CreatedAt       time.Time `gorm:"autoCreateTime;column:CreatedAt"`                                // Thời gian tạo
 	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:UpdatedAt"`                                // Thời gian cập nhật
 	XacThucOTP      bool      `json:"xacThucOTP" gorm:"default:false;column:XacThucOTP"`
-}
-
-type DeviceUser struct {
-	ID        string    `gorm:"primaryKey;type:char(36);default:uuid();column:id_uuid"`
-	DeviceID  string    `gorm:"type:char(36);not null"`
-	AccountID string    `gorm:"type:char(36);not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime;column:CreatedAt"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;column:UpdatedAt"`
-}
-
-func (DeviceUser) TableName() string {
-	return "deviceuser"
 }

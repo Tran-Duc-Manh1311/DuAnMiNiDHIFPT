@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"MiniHIFPT/database"
-	"MiniHIFPT/models"
+	"MiniHIFPT/services"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,62 +23,12 @@ func TransferOwnership(c *fiber.Ctx) error {
 		})
 	}
 
-	// Kiểm tra quyền truy cập của tài khoản đối với khách hàng cũ
-	var count int64
-	// Kiểm tra xem tài khoản có quyền truy cập vào hợp đồng của khách hàng cũ hay không
-	if err := database.DB.Model(&models.Account_Contract{}).
-		Where("AccountID = ? AND CustomerID = ?", accountID, request.OldCustomerID).
-		Count(&count).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Lỗi khi kiểm tra quyền truy cập",
-		})
-	}
-
-	if count == 0 {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Bạn không có quyền chuyển nhượng hợp đồng này",
-		})
-	}
-
-	// Kiểm tra xem khách hàng cũ có tồn tại không
-	oldCustomer, err := database.FindCustomerByID(request.OldCustomerID)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Không tìm thấy khách hàng cũ",
-		})
-	}
-
-	// Kiểm tra xem khách hàng mới có tồn tại không
-	newCustomer, err := database.FindCustomerByID(request.NewCustomerID)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Không tìm thấy khách hàng mới",
-		})
-	}
-
-	// Lấy tất cả hợp đồng của khách hàng cũ dựa trên số điện thoại
-	customerContracts, err := database.FindCustomerContractsByPhoneNumber(oldCustomer.SoDienThoai)
+	// Gọi service để xử lý logic chuyển sở hữu hợp đồng
+	err := services.TransferOwnership(accountID, request.OldCustomerID, request.NewCustomerID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Không thể tìm thấy các hợp đồng của khách hàng cũ",
+			"error": err.Error(),
 		})
-	}
-
-	// Nếu không có hợp đồng nào thuộc khách hàng cũ
-	if len(customerContracts) == 0 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Không có hợp đồng nào thuộc về khách hàng cũ",
-		})
-	}
-
-	// Cập nhật tất cả các hợp đồng để chuyển sang khách hàng mới
-	for _, contract := range customerContracts {
-		// Cập nhật cột `SoDienThoai` sang số điện thoại của khách hàng mới
-		if err := database.TransferContractOwnership(&contract, newCustomer.SoDienThoai); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"message": "Không thể chuyển nhượng hợp đồng",
-			})
-		}
 	}
 
 	// Trả về kết quả
