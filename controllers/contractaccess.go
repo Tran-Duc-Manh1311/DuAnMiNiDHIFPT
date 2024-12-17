@@ -1,38 +1,33 @@
 package controllers
 
 import (
-	"MiniHIFPT/database"
-	"MiniHIFPT/models"
+	"MiniHIFPT/services"
 	"github.com/gofiber/fiber/v2"
 )
 
-// Thêm quyền truy cập cho tài khoản đối với hợp đồng
+// AddContractAccessController xử lý thêm quyền truy cập cho tài khoản đối với hợp đồng
 func AddContractAccess(c *fiber.Ctx) error {
+	// Dữ liệu đầu vào từ request body
 	var data struct {
 		AccountID  string `json:"accountID"`
 		ContractID string `json:"contractID"`
 	}
 
-	// Xử lý dữ liệu đầu vào
+	// Parse request body
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Dữ liệu đầu vào không hợp lệ",
 		})
 	}
 
-	// Thêm quyền truy cập vào bảng trung gian
-	accountContract := models.Account_Contract{
-		AccountID:  data.AccountID,
-		ContractID: data.ContractID,
-	}
-
-	// Lưu quyền truy cập vào cơ sở dữ liệu
-	if err := database.DB.Create(&accountContract).Error; err != nil {
+	// Gọi hàm service để xử lý logic thêm quyền truy cập
+	if err := services.AddContractAccessService(data.AccountID, data.ContractID); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Không thể thêm quyền truy cập",
+			"error": err.Error(), //trả lỗi từ service
 		})
 	}
 
+	// Trả về kết quả thành công
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Thêm quyền truy cập thành công",
 	})

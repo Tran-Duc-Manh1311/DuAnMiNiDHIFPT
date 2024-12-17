@@ -1,4 +1,4 @@
-package controllers
+package security
 
 import (
 	"MiniHIFPT/models"
@@ -8,7 +8,7 @@ import (
 
 var jwtSecretKey = []byte("your_secret_key") // Khai báo khóa bí mật cho việc ký và xác thực token
 
-func generateJWT(account *models.Accounts) (string, error) {
+func GenerateJWT(account *models.Accounts) (string, error) {
 	claims := jwt.MapClaims{
 		"accountID":   account.ID,
 		"phoneNumber": account.SoDienThoai,

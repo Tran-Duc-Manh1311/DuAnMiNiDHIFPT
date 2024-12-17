@@ -114,3 +114,46 @@ type Devices struct {
 	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:UpdatedAt"`                                // Thời gian cập nhật
 	XacThucOTP      bool      `json:"xacThucOTP" gorm:"default:false;column:XacThucOTP"`
 }
+
+type Invoice struct {
+	ID            string     `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"`                     // UUID tự động
+	ContractID    string     `gorm:"not null;column:contract_id"`                                                   // Liên kết với Contract
+	Amount        float64    `gorm:"not null;column:amount"`                                                        // Số tiền hóa đơn
+	PaymentStatus string     `gorm:"type:enum('Pending','Paid','Overdue');default:'Pending';column:payment_status"` // Trạng thái thanh toán
+	DueDate       time.Time  `gorm:"not null;column:due_date"`                                                      // Ngày đến hạn
+	PaidDate      *time.Time `gorm:"column:paid_date"`                                                              // Ngày thanh toán (có thể null)
+	CreatedAt     time.Time  `gorm:"autoCreateTime;column:created_at"`                                              // Thời gian tạo
+	UpdatedAt     time.Time  `gorm:"autoUpdateTime;column:updated_at"`                                              // Thời gian cập nhật
+	ServiceName   string     `json:"servicename" gorm:"column:service_name"`                                        // Tên dịch vụ
+}
+
+func (Invoice) TableName() string {
+	return "invoice" // Tên bảng trong cơ sở dữ liệu
+}
+
+type Payment struct {
+	ID          string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"`        // UUID tự động
+	InvoiceID   string    `gorm:"not null;column:invoice_id"`                                       // Liên kết với Invoice
+	Amount      float64   `gorm:"not null;column:amount"`                                           // Số tiền thanh toán
+	PaymentDate time.Time `gorm:"autoCreateTime;column:payment_date"`                               // Ngày thanh toán
+	Method      string    `gorm:"not null;column:method"`                                           // Phương thức thanh toán
+	Status      string    `gorm:"type:enum('Completed','Pending');default:'Pending';column:status"` // Trạng thái thanh toán
+	CreatedAt   time.Time `gorm:"autoCreateTime;column:created_at"`                                 // Thời gian tạo
+	UpdatedAt   time.Time `gorm:"autoUpdateTime;column:updated_at"`                                 // Thời gian cập nhật
+}
+type PaymentMethod struct {
+	ID        string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"` // UUID tự động
+	Method    string    `gorm:"unique;not null;column:method"`                             // Mã phương thức thanh toán (duy nhất)
+	Name      string    `gorm:"not null;column:name"`                                      // Tên phương thức thanh toán
+	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`                          // Thời gian tạo
+	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`                          // Thời gian cập nhật
+}
+type PaymentTransaction struct {
+	ID              string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"`     // UUID tự động
+	PaymentID       string    `gorm:"not null;column:payment_id"`                                    // Liên kết với Payment
+	TransactionID   string    `gorm:"unique;not null;column:transaction_id"`                         // Mã giao dịch
+	TransactionDate time.Time `gorm:"autoCreateTime;column:transaction_date"`                        // Ngày thực hiện giao dịch
+	Status          string    `gorm:"type:enum('Success','Failed');default:'Success';column:status"` // Trạng thái giao dịch
+	CreatedAt       time.Time `gorm:"autoCreateTime;column:created_at"`                              // Thời gian tạo
+	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:updated_at"`                              // Thời gian cập nhật
+}

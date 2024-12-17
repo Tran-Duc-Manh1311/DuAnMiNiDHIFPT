@@ -6,9 +6,9 @@ import (
 	"gorm.io/gorm"
 	"regexp"
 	// "strings"
+	"fmt"
 	"github.com/mssola/user_agent"
-	// "fmt"
-	"time"
+	// "time"
 )
 
 // Kiểm tra nếu số điện thoại đã tồn tại trong hệ thống
@@ -104,24 +104,6 @@ func ParseOperatingSystem(userAgent string) string {
 	return "Unknown OS"
 }
 
-// func ParseOperatingSystem(userAgent string) string {
-// 	fmt.Println("Received User-Agent:", userAgent) // In ra User-Agent để kiểm tra
-// 	userAgent = strings.ToLower(userAgent)
-
-// 	if strings.Contains(userAgent, "windows") {
-// 		return "Windows"
-// 	} else if strings.Contains(userAgent, "mac os") || strings.Contains(userAgent, "macintosh") {
-// 		return "Mac OS"
-// 	} else if strings.Contains(userAgent, "linux") {
-// 		return "Linux"
-// 	} else if strings.Contains(userAgent, "android") {
-// 		return "Android"
-// 	} else if strings.Contains(userAgent, "iphone") || strings.Contains(userAgent, "ipad") || strings.Contains(userAgent, "ios") {
-// 		return "iOS"
-// 	}
-// 	return "Unknown OS"
-// }
-
 // Tạo thiết bị mới trong cơ sở dữ liệu
 func CreateDevice(device *models.Devices) error {
 	// Kiểm tra xem UUID đã tồn tại chưa
@@ -143,7 +125,7 @@ func CreateDevice(device *models.Devices) error {
 func UpdateDevice(device *models.Devices) error {
 	// Kiểm tra xem thiết bị có tồn tại không
 	var existingDevice models.Devices
-	err := DB.Where("ID = ?", device.ID).First(&existingDevice).Error
+	err := DB.Where("id_uuid = ?", device.ID).First(&existingDevice).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		// Nếu không tìm thấy thiết bị, trả về lỗi
 		return errors.New("device not found")
@@ -153,18 +135,22 @@ func UpdateDevice(device *models.Devices) error {
 }
 
 // Hàm lấy thông tin số lần đăng nhập trong ngày của người dùng
-func GetDailyLoginAttempts(phone string) (*models.LoginAttempt, error) {
-	var attempt models.LoginAttempt
-	err := DB.Where("SoDienThoai = ? AND Ngay >= ?", phone, time.Now().Add(-24*time.Hour)).First(&attempt).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, err
+
+func GetDailyLoginAttempts(soDienThoai string) (*models.LoginAttempt, error) {
+	var loginAttempt models.LoginAttempt
+	err := DB.Where("SoDienThoai = ? AND DATE(Ngay) = CURRENT_DATE", soDienThoai).First(&loginAttempt).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
 	}
-	return &attempt, nil
+	return &loginAttempt, err
 }
 
 // Hàm lưu số lần đăng nhập thất bại của người dùng
 func SaveLoginAttempt(attempt *models.LoginAttempt) error {
-	return DB.Save(attempt).Error
+	if err := DB.Save(attempt).Error; err != nil {
+		return fmt.Errorf("lỗi khi lưu đăng nhập thất bại: %v", err)
+	}
+	return nil
 }
 
 // Lưu thông tin người dùng và thiết bị

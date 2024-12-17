@@ -22,6 +22,9 @@ func Setup(app *fiber.App) {
 	app.Get("/search", middleware.Authenticate, controllers.SearchContractOrCustomer)
 	//kiểm tra trạng thái của hợp đồng
 	app.Get("status/:id", middleware.Authenticate, controllers.CheckContractStatusHandler)
+	//thống kê hợp đồng theo trạng thái
+	app.Get("contract/status/:status", middleware.Authenticate, controllers.GetContractCountByStatus)
+
 	// Route tạo hợp đồng mới (cần xác thực)
 	app.Post("/contracts", middleware.Authenticate, controllers.CreateContractHandler)
 	// Route sửa hợp đồng (cần xác thực)
@@ -41,5 +44,7 @@ func Setup(app *fiber.App) {
 
 	// Route cấp quyền cho tài khoản đối với hợp đồng (cần xác thực)
 	app.Post("/grant-access", middleware.Authenticate, controllers.AddContractAccess)
+	//tạo hóa đơn
+	app.Post("/invoices", middleware.Authenticate, controllers.CreateInvoice)
 
 }
