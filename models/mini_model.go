@@ -51,6 +51,7 @@ type Customer_Contractt struct {
 	ID          string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id_uuid"` // UUID tự động
 	SoDienThoai string `json:"soDienThoai" gorm:"unique;not null;column:SoDienThoai"`          // Số điện thoại (duy nhất)
 	HopDongID   string `gorm:"index;not null;column:HopDongID"`                                // ID hợp đồng
+
 }
 
 // Chỉ định tên bảng trong MySQL

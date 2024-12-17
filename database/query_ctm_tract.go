@@ -11,7 +11,7 @@ func GetCtm_contract() ([]models.Customer_Contractt, error) {
 	return ctm_tracts, result.Error
 }
 
-// Hàm tạo hợp đồng mới trong cơ sở dữ liệu
+// Hàm tạo liên kết hợp đồng mới trong cơ sở dữ liệu
 func CreateCustomerContract(ctm_tract *models.Customer_Contractt) error {
 	// Thực hiện truy vấn để tạo hợp đồng mới
 	result := DB.Create(ctm_tract)
@@ -22,10 +22,23 @@ func CreateCustomerContract(ctm_tract *models.Customer_Contractt) error {
 }
 
 // Kiểm tra xem số điện thoại đã được liên kết với hợp đồng trước đó chưa
-func CheckExistingContract(phone string) (int64, error) {
+//	func CheckExistingContract(phone string) (int64, error) {
+//		var count int64
+//		if err := DB.Model(&models.Customer_Contractt{}).Where("SoDienThoai = ?", phone).Count(&count).Error; err != nil {
+//			return 0, err
+//		}
+//		return count, nil
+//	}
+
+// Kiểm tra hợp đồng đã liên kết với số điện thoại chưa
+func CheckExistingContractByPhoneAndContract(SoDienThoai, HopDongID string) (bool, error) {
 	var count int64
-	if err := DB.Model(&models.Customer_Contractt{}).Where("SoDienThoai = ?", phone).Count(&count).Error; err != nil {
-		return 0, err
+	// Truy vấn xem hợp đồng đã liên kết với số điện thoại này chưa
+	if err := DB.Model(&models.Customer_Contractt{}).
+		Where("SoDienThoai = ? AND HopDongID = ?", SoDienThoai, HopDongID).
+		Count(&count).Error; err != nil {
+		return false, err
 	}
-	return count, nil
+
+	return count > 0, nil
 }

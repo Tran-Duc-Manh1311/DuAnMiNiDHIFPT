@@ -19,7 +19,10 @@ func GetCtmContracts(c *fiber.Ctx) error {
 
 // Tạo liên kết hợp đồng
 func CreateCtmContracts(c *fiber.Ctx) error {
+	// Khởi tạo một biến Customer_Contractt
 	var ctmContract models.Customer_Contractt
+
+	// Phân tích dữ liệu đầu vào từ body request
 	if err := c.BodyParser(&ctmContract); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Dữ liệu đầu vào không hợp lệ",
@@ -33,6 +36,7 @@ func CreateCtmContracts(c *fiber.Ctx) error {
 		})
 	}
 
+	// Trả về kết quả thành công
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "Tạo liên kết số điện thoại và hợp đồng thành công",
 	})
