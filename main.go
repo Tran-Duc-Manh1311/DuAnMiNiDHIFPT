@@ -10,7 +10,7 @@ import (
 func main() {
 	// Kết nối cơ sở dữ liệu
 	database.ConnectDB()
-	log.Println("Kết nối cơ sở dữ liệu thành công!")
+	// log.Println("Kết nối cơ sở dữ liệu thành công!")
 
 	// Khởi tạo ứng dụng Fiber
 	app := fiber.New()

@@ -46,5 +46,7 @@ func Setup(app *fiber.App) {
 	app.Post("/grant-access", middleware.Authenticate, controllers.AddContractAccess)
 	//tạo hóa đơn
 	app.Post("/invoices", middleware.Authenticate, controllers.CreateInvoice)
+	//thanh toán hóa đơn
+	app.Post("/payment", middleware.Authenticate, controllers.ProcessPayment)
 
 }

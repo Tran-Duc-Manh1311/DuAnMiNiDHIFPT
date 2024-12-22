@@ -142,6 +142,11 @@ type Payment struct {
 	CreatedAt   time.Time `gorm:"autoCreateTime;column:created_at"`                                 // Thời gian tạo
 	UpdatedAt   time.Time `gorm:"autoUpdateTime;column:updated_at"`                                 // Thời gian cập nhật
 }
+
+func (Payment) TableName() string {
+	return "payment" // Tên bảng trong cơ sở dữ liệu
+}
+
 type PaymentMethod struct {
 	ID        string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"` // UUID tự động
 	Method    string    `gorm:"unique;not null;column:method"`                             // Mã phương thức thanh toán (duy nhất)
@@ -149,6 +154,11 @@ type PaymentMethod struct {
 	CreatedAt time.Time `gorm:"autoCreateTime;column:created_at"`                          // Thời gian tạo
 	UpdatedAt time.Time `gorm:"autoUpdateTime;column:updated_at"`                          // Thời gian cập nhật
 }
+
+func (PaymentMethod) TableName() string {
+	return "paymentmethod" // Tên bảng trong cơ sở dữ liệu
+}
+
 type PaymentTransaction struct {
 	ID              string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4();column:id"`     // UUID tự động
 	PaymentID       string    `gorm:"not null;column:payment_id"`                                    // Liên kết với Payment
@@ -157,4 +167,8 @@ type PaymentTransaction struct {
 	Status          string    `gorm:"type:enum('Success','Failed');default:'Success';column:status"` // Trạng thái giao dịch
 	CreatedAt       time.Time `gorm:"autoCreateTime;column:created_at"`                              // Thời gian tạo
 	UpdatedAt       time.Time `gorm:"autoUpdateTime;column:updated_at"`                              // Thời gian cập nhật
+}
+
+func (PaymentTransaction) TableName() string {
+	return "paymenttransaction" // Tên bảng trong cơ sở dữ liệu
 }
