@@ -12,6 +12,8 @@ func Setup(app *fiber.App) {
 	app.Get("/customers", middleware.Authenticate, controllers.GetCustomers)
 	// Route thêm khách hàng mới (cần xác thực)
 	app.Post("/customers", middleware.Authenticate, controllers.CreateCustomers)
+	//lấy thông tin khách hàng theo ID
+	app.Get("/customer/:id", middleware.Authenticate, controllers.GetCustomerByID)
 	// Route chuyển hợp đồng (cần xác thực)
 	app.Post("/transfer", middleware.Authenticate, controllers.TransferOwnership)
 	// Route lấy thông tin hợp đồng (cần xác thực)
@@ -46,7 +48,11 @@ func Setup(app *fiber.App) {
 	app.Post("/grant-access", middleware.Authenticate, controllers.AddContractAccess)
 	//tạo hóa đơn
 	app.Post("/invoices", middleware.Authenticate, controllers.CreateInvoice)
+	//lấy thông tin hóa đơn
+	app.Get("/invoices/:id", middleware.Authenticate, controllers.GetInvoiceByID)
 	//thanh toán hóa đơn
 	app.Post("/payment", middleware.Authenticate, controllers.ProcessPayment)
+	//thêm phương thức thanh toán
+	app.Post("/method", middleware.Authenticate, controllers.CreatePaymentMethod)
 
 }

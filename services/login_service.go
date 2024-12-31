@@ -17,7 +17,6 @@ func HandleLogin(c *fiber.Ctx) error {
 			"error": "Dữ liệu đầu vào không hợp lệ",
 		})
 	}
-
 	if loginCredentials.SoDienThoai == "" || loginCredentials.MatKhau == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Số điện thoại và mật khẩu không được để trống",

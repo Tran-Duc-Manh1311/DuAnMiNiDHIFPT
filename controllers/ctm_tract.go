@@ -29,8 +29,10 @@ func CreateCtmContracts(c *fiber.Ctx) error {
 		})
 	}
 
+	// Lấy accountID từ thông tin người dùng đã đăng nhập (tương tự như trong UpdateContract)
+	accountID := c.Locals("accountID").(string)
 	// Kiểm tra và tạo liên kết hợp đồng qua service
-	if err := services.CreateCtmContract(ctmContract); err != nil {
+	if err := services.CreateCtmContract(ctmContract, accountID); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})

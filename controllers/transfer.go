@@ -13,7 +13,7 @@ func TransferOwnership(c *fiber.Ctx) error {
 		NewCustomerID string `json:"newCustomerId"`
 	}
 
-	// Lấy accountID từ thông tin người dùng đã đăng nhập (tương tự như trong UpdateContract)
+	// Lấy accountID từ thông tin người dùng đã đăng nhập
 	accountID := c.Locals("accountID").(string)
 
 	// Phân tích dữ liệu JSON từ yêu cầu

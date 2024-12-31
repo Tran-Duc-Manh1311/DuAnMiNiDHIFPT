@@ -2,22 +2,18 @@ package services
 
 import (
 	"MiniHIFPT/database"
-	"MiniHIFPT/models"
 	"errors"
 )
 
 // Chuyển sở hữu hợp đồng từ khách hàng cũ sang khách hàng mới
 func TransferOwnership(accountID, oldCustomerID, newCustomerID string) error {
 	// Kiểm tra quyền truy cập của tài khoản đối với khách hàng cũ
-	var count int64
-	if err := database.DB.Model(&models.Account_Contract{}).
-		Where("AccountID = ? AND CustomerID = ?", accountID, oldCustomerID).
-		Count(&count).Error; err != nil {
+	accessCount, err := database.CheckAccess(accountID, oldCustomerID)
+	if err != nil {
 		return errors.New("Lỗi khi kiểm tra quyền truy cập")
 	}
-
-	if count == 0 {
-		return errors.New("Bạn không có quyền chuyển nhượng hợp đồng này")
+	if accessCount == 0 {
+		return errors.New("Bạn không có quyền truy cập ")
 	}
 
 	// Kiểm tra xem khách hàng cũ có tồn tại không

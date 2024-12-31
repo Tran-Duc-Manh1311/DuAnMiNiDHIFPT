@@ -16,6 +16,15 @@ func GetCustomers(c *fiber.Ctx) error {
 	return c.JSON(customers)
 }
 
+// lấy hợp đồng theo ID
+func GetCustomerByID(c *fiber.Ctx) error {
+	customerID := c.Params("id")
+
+	// accountID := c.Locals("accountID").(string)
+
+	customer := services.GetAllCustomerByID(customerID)
+	return c.JSON(customer)
+}
 func CreateCustomers(c *fiber.Ctx) error {
 	var tempCustomer models.TempCustomer
 
@@ -25,7 +34,6 @@ func CreateCustomers(c *fiber.Ctx) error {
 			"error": "Dữ liệu đầu vào không hợp lệ",
 		})
 	}
-
 	customer, err := services.CreateCustomerService(&tempCustomer)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

@@ -34,19 +34,16 @@ func GetContracts() *ServiceResponse {
 
 func GetContractByID(contractID string, accountID string) *ServiceResponse {
 	idUUID, err := uuid.Parse(contractID)
+	count, err := database.CheckAccess(accountID, contractID)
 	if err != nil {
 		return respond(fiber.StatusBadRequest, "ID hợp đồng không hợp lệ", nil)
 	}
-
-	var count int64
-	if err := database.DB.Model(&models.Account_Contract{}).
-		Where("AccountID = ? AND ContractID = ?", accountID, idUUID).
-		Count(&count).Error; err != nil {
+	//kiểm tra quyền truy cập
+	if err != nil {
 		return respond(fiber.StatusInternalServerError, "Lỗi khi kiểm tra quyền truy cập", nil)
 	}
-
 	if count == 0 {
-		return respond(fiber.StatusForbidden, "Bạn không có quyền truy cập hợp đồng này", nil)
+		return respond(fiber.StatusForbidden, "Bạn không có quyền cập nhật hợp đồng này", nil)
 	}
 
 	var contract models.Contract
@@ -89,16 +86,34 @@ func CreateContractService(c *fiber.Ctx) *ServiceResponse {
 }
 
 func CheckContractStatusService(c *fiber.Ctx) *ServiceResponse {
+	// Lấy contractID từ URL params
 	contractID := c.Params("id")
 	if contractID == "" {
 		return respond(fiber.StatusBadRequest, "ID hợp đồng không hợp lệ", nil)
 	}
 
+	// Lấy accountID từ context (do middleware đặt vào)
+	accountID, ok := c.Locals("accountID").(string)
+	if !ok || accountID == "" {
+		return respond(fiber.StatusUnauthorized, "Không thể xác thực người dùng", nil)
+	}
+
+	// Kiểm tra quyền truy cập CheckAccess
+	accessCount, err := database.CheckAccess(accountID, contractID)
+	if err != nil {
+		return respond(fiber.StatusInternalServerError, "Lỗi khi kiểm tra quyền truy cập", nil)
+	}
+	if accessCount == 0 {
+		return respond(fiber.StatusForbidden, "Bạn không có quyền truy cập hợp đồng này", nil)
+	}
+
+	// Truy vấn thông tin hợp đồng từ cơ sở dữ liệu
 	contract, err := database.GetContractByID(contractID)
 	if err != nil {
 		return respond(fiber.StatusInternalServerError, "Lỗi khi truy vấn cơ sở dữ liệu", nil)
 	}
 
+	// Trả về thông tin hợp đồng
 	return respond(fiber.StatusOK, "Trạng thái hợp đồng", map[string]interface{}{
 		"Hợp đồng": contract.ID,
 		"Status":   contract.Status,

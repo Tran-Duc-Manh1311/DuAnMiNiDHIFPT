@@ -1,14 +1,10 @@
 package controllers
 
 import (
-	// "MiniHIFPT/database"
 	"MiniHIFPT/models"
-	// "MiniHIFPT/security"
 	"MiniHIFPT/services"
-	// "math/rand"
-	// "regexp"
-	// "strconv"
-	// "time"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,12 +13,26 @@ func Register(c *fiber.Ctx) error {
 	// Lấy dữ liệu đầu vào từ request
 	var newAccount models.Accounts
 	if err := c.BodyParser(&newAccount); err != nil {
+		fmt.Printf("err: %v\n", err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Dữ liệu đầu vào không hợp lệ",
 		})
 	}
 
 	// Gọi service để xử lý đăng ký
+	// result,errService:= service.Register(&newAccount)
+	// if errService !=nil{
+	// 	return c.JSON(fiber.Map{
+	// 			"status":errService.Status,
+	// 			"error": errService.Msg,
+	// 		})
+	// }else{
+	// 	return c.JSON(fiber.Map{
+	// 		"status":1,
+	// 			"mes": "Ok",
+	// 			"data":result,
+	// 		})
+	// }
 	if err := services.RegisterService(&newAccount); err != nil {
 		// Trả về lỗi phù hợp dựa trên loại lỗi từ service
 		switch err {

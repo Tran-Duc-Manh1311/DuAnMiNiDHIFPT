@@ -27,16 +27,16 @@ func ProcessPayment(c *fiber.Ctx) error {
 			"error": "Số tiền thanh toán phải lớn hơn 0",
 		})
 	}
-
 	// Kiểm tra phương thức thanh toán
 	if paymentRequest.Method == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Phương thức thanh toán không hợp lệ",
 		})
 	}
-
+	// Lấy accountID từ thông tin người dùng đã đăng nhập (tương tự như trong UpdateContract)
+	accountID := c.Locals("accountID").(string)
 	// Gọi service để xử lý thanh toán
-	err := services.ProcessPayment(paymentRequest.InvoiceID, paymentRequest.Amount, paymentRequest.Method)
+	err := services.ProcessPayment(paymentRequest.InvoiceID, paymentRequest.Amount, paymentRequest.Method, accountID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Không thể xử lý thanh toán: " + err.Error(),

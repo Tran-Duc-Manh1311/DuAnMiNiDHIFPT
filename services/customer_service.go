@@ -4,12 +4,33 @@ import (
 	"MiniHIFPT/database"
 	"MiniHIFPT/models"
 	"errors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"regexp"
 	"time"
 )
 
 func GetAllCustomers() ([]models.Customer, error) {
 	return database.GetCustomers()
+}
+func GetAllCustomerByID(customerID string) *ServiceResponse {
+	// Chuyển đổi customerID thành UUID
+	idUUID, err := uuid.Parse(customerID)
+	if err != nil {
+		return respond(fiber.StatusBadRequest, "ID khách hàng không hợp lệ", nil)
+	}
+
+	// Gọi hàm GetCustomerByID để lấy thông tin khách hàng
+	customer, err := database.GetCustomerByID(idUUID.String())
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return respond(fiber.StatusNotFound, "Khách hàng không tồn tại", nil)
+		}
+		return respond(fiber.StatusInternalServerError, "Lỗi khi lấy thông tin khách hàng", nil)
+	}
+
+	return respond(fiber.StatusOK, "Lấy thông tin chi tiết khách hàng thành công", customer)
 }
 
 func CreateCustomerService(tempCustomer *models.TempCustomer) (*models.Customer, error) {
@@ -42,7 +63,7 @@ func CreateCustomerService(tempCustomer *models.TempCustomer) (*models.Customer,
 	nameRegex := "^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠƯàáâãèéêìíòóôõùúăđĩũơưạ-ỹẠ-Ỹ ]+$"
 	matched, err := regexp.MatchString(nameRegex, customer.TenKhachHang)
 	if err != nil || !matched {
-		return nil, errors.New("tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng Việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng.")
+		return nil, errors.New("tên khách hàng không hợp lệ. Chỉ được nhập chữ tiếng việt có dấu, cả chữ hoa và chữ thường, cùng khoảng trắng")
 	}
 
 	// Lưu khách hàng vào DB

@@ -5,15 +5,16 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// Handler để lấy danh sách hợp đồng
+// lấy danh sách hợp đồng
 func GetContracts(c *fiber.Ctx) error {
 	contracts := services.GetContracts()
 	return c.JSON(contracts)
 }
 
-// Handler để lấy hợp đồng theo ID
+// lấy hợp đồng theo ID
 func GetContractByID(c *fiber.Ctx) error {
 	contractID := c.Params("id")
+
 	accountID := c.Locals("accountID").(string)
 
 	contract := services.GetContractByID(contractID, accountID)
@@ -33,7 +34,7 @@ func CreateContractHandler(c *fiber.Ctx) error {
 	})
 }
 
-// CheckContractStatusHandler xử lý request kiểm tra trạng thái hợp đồng
+// kiểm tra trạng thái hợp đồng
 func CheckContractStatusHandler(c *fiber.Ctx) error {
 	response := services.CheckContractStatusService(c)
 	return c.JSON(response)

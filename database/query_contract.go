@@ -25,7 +25,7 @@ func GetContractByID(idUUID string) (models.Contract, error) {
 	var contract models.Contract
 
 	// In thông tin để kiểm tra
-	fmt.Println("Querying contract with ID:", idUUID)
+	fmt.Println("Truy vấn hợp đồng với ID:", idUUID)
 
 	// Truy vấn dữ liệu từ database
 	result := DB.First(&contract, "id_uuid = ?", idUUID)

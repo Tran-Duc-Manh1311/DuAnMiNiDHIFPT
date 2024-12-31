@@ -22,7 +22,7 @@ func CreateInvoice(c *fiber.Ctx) error {
 	}
 
 	// Tạo ngày đến hạn mặc định (30 ngày kể từ ngày hiện tại)
-	dueDate := time.Now().Add(30 * 24 * time.Hour) // Tính ngày đến hạn là 30 ngày sau ngày hiện tại
+	dueDate := time.Now().Add(30 * 24 * time.Hour) //  30 ngày sau ngày hiện tại
 
 	// Tạo hóa đơn
 	invoice, err := services.CreateInvoice(invoiceRequest.ContractID, invoiceRequest.Amount, dueDate, invoiceRequest.ServiceName)
@@ -37,4 +37,12 @@ func CreateInvoice(c *fiber.Ctx) error {
 		"message": "Tạo hóa đơn thành công",
 		"invoice": invoice,
 	})
+}
+
+// hiển thị hóa đơn
+func GetInvoiceByID(c *fiber.Ctx) error {
+	invoiceID := c.Params("id")
+	// accountID := c.Locals("accountID").(string)
+	customer := services.GetAllInvoiceByID(invoiceID)
+	return c.JSON(customer)
 }
